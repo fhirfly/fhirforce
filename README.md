@@ -45,11 +45,34 @@ trigger FHIRDataTrigger on FHIR_Data__c (after insert, after update, after delet
         List<FHIR_Data__c> recordsToUpdate = new List<FHIR_Data__c>();
         
         for (FHIR_Data__c record : [SELECT Id, Name, Field1__c, Field2__c FROM FHIR_Data__c WHERE Id IN :recordIds]) {
-            // Update the record fields with the queried data
-            // You'll need to implement the logic to map the FHIR data to Salesforce fields
-            
-            record.Field1__c = 'Updated Value 1';
-            record.Field2__c = 'Updated Value 2';
+           // Assuming you are querying the 'Patient' resource from the FHIR server
+
+                String responseBody = response.getBody();
+                
+                // Process the queried data and update the corresponding Salesforce records
+                List<FHIR_Data__c> recordsToUpdate = new List<FHIR_Data__c>();
+                
+                // Iterate over the queried FHIR resources
+                FHIR.Bundle bundle = (FHIR.Bundle) FHIR.fromJSON(responseBody);
+                for (FHIR.Bundle.Entry entry : bundle.entry) {
+                    if (entry.resource.resourceType == 'Patient') {
+                        FHIR.Patient patient = (FHIR.Patient) entry.resource;
+                        
+                        // Create or update a Salesforce record for each Patient resource
+                        FHIR_Data__c record = new FHIR_Data__c();
+                        
+                        // Map FHIR fields to Salesforce fields
+                        record.Name = patient.name[0].given[0] + ' ' + patient.name[0].family;
+                        record.Field1__c = patient.gender;
+                        record.Field2__c = patient.birthDate.toString();
+                        
+                        recordsToUpdate.add(record);
+                    }
+                }
+    
+    // Perform the updates on the FHIR_Data__c records
+    update recordsToUpdate;
+}
             
             recordsToUpdate.add(record);
         }
