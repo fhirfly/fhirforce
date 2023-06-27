@@ -61,10 +61,25 @@ trigger FHIRDataTrigger on FHIR_Data__c (after insert, after update, after delet
                         // Create or update a Salesforce record for each Patient resource
                         FHIR_Data__c record = new FHIR_Data__c();
                         
-                        // Map FHIR fields to Salesforce fields
-                        record.Name = patient.name[0].given[0] + ' ' + patient.name[0].family;
-                        record.Field1__c = patient.gender;
-                        record.Field2__c = patient.birthDate.toString();
+                         FHIR.Patient patient = (FHIR.Patient) entry.resource;
+            
+            // Create or update an Account and Contact record for each Patient resource
+            Account account = new Account();
+            Contact contact = new Contact();
+            
+            // Map FHIR fields to Salesforce fields
+            account.Name = patient.name[0].given[0] + ' ' + patient.name[0].family;
+            account.Type = 'Customer'; // Set the appropriate Account type
+            
+            contact.FirstName = patient.name[0].given[0];
+            contact.LastName = patient.name[0].family;
+            contact.AccountId = account.Id;
+            contact.Birthdate = patient.birthDate;
+            contact.Gender__c = patient.gender;
+            
+            accountsToUpdate.add(account);
+            contactsToUpdate.add(contact);
+        }
                         
                         recordsToUpdate.add(record);
                     }
@@ -92,3 +107,4 @@ Please note that this is a basic example, and you will need to customize it acco
 Remember to replace 'FHIR_SERVER_ENDPOINT' and 'API_RESOURCE' with the appropriate values based on your FHIR server configuration and the resource type you want to query.
 
 I hope this example helps you understand how you can monitor Salesforce events and interact with a FHIR server using Apex code.
+See more at https://developer.salesforce.com/docs/atlas.en-us.health_cloud_object_reference.meta/health_cloud_object_reference/map_fhir_overview.htm
