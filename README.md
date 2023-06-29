@@ -104,6 +104,9 @@ In this example, we create a trigger on the FHIR_Data__c object that fires after
 
 Please note that this is a basic example, and you will need to customize it according to your specific FHIR server implementation, including authentication, headers, and data mapping logic.
 
+https://developer.salesforce.com/docs/atlas.en-us.health_cloud_object_reference.meta/health_cloud_object_reference/map_fhir_overview.htm
+
+
 Remember to replace 'FHIR_SERVER_ENDPOINT' and 'API_RESOURCE' with the appropriate values based on your FHIR server configuration and the resource type you want to query.
 
 I hope this example helps you understand how you can monitor Salesforce events and interact with a FHIR server using Apex code.
